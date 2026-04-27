@@ -310,3 +310,31 @@ textarea { resize: vertical; }
   .admin-email { max-width: 150px; }
   .form-actions .btn { width: 100%; }
 }
+
+/* =========================================================
+   FIX: textos largos en tarjetas de eventos
+   Evita que descripciones, títulos o textos sin espacios se salgan
+   del contenedor en el gestor y en la vista previa interna.
+   ========================================================= */
+.event-card,
+.event-body,
+.event-card h3,
+.event-card p,
+.event-date {
+  min-width: 0;
+}
+
+.event-card h3,
+.event-date,
+.event-card p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.event-card p {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: calc(1.55em * 4);
+}
