@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de eventos | IPROYEC</title>
+  <link rel="icon" href="assets/favicon.ico" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="js/supabase-config.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/supabase-client.js" defer></script>
+  <script src="js/guard.js" defer></script>
+  <script src="js/panel.js" defer></script>
+</head>
+<body>
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <span id="loadingText">Cargando...</span>
+    </div>
+  </div>
+
+  <header class="admin-header">
+    <div class="container header-wrap">
+      <a class="brand" href="panel.html" aria-label="Ir al panel IPROYEC">
+        <img src="assets/logo-iproyec.png" alt="Logo IPROYEC" class="brand-mark" />
+        <div class="brand-copy">
+          <strong>IPROYEC</strong>
+          <span>Gestor de eventos</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="adminNav">
+        <span></span><span></span><span></span><span class="sr-only">Abrir menú</span>
+      </button>
+
+      <nav class="admin-nav" id="adminNav" aria-label="Navegación del panel">
+        <a class="active" href="panel.html">Gestor</a>
+        <a href="preview.html">Vista previa</a>
+        <a href="https://iproyeccopiapo.cl/" target="_blank" rel="noopener noreferrer">Página principal</a>
+      </nav>
+
+      <div class="header-actions">
+        <span class="admin-email" id="adminEmail">Administrador</span>
+        <button class="btn btn-ghost compact" type="button" data-logout>Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="admin-hero">
+      <div class="container admin-hero-grid">
+        <div>
+          <span class="eyebrow">Panel privado</span>
+          <h1>Gestor de eventos</h1>
+          <p>
+            Crea eventos, déjalos como borrador o publícalos cuando estén listos. Esta sección es solo administrativa; la visualización oficial se conectará después en la página principal.
+          </p>
+        </div>
+        <aside class="hero-stat-card" aria-label="Resumen de eventos">
+          <span>Resumen general</span>
+          <strong id="totalEventos">0</strong>
+          <small>Eventos registrados en Supabase</small>
+          <div class="stats-grid">
+            <div class="stat-mini"><strong id="totalPublicados">0</strong><span>Publicados</span></div>
+            <div class="stat-mini"><strong id="totalBorradores">0</strong><span>Borradores</span></div>
+            <div class="stat-mini"><strong>1</strong><span>Tipo: Evento</span></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-space" id="crear">
+      <div class="container admin-grid">
+        <article class="panel-card form-card">
+          <div class="section-heading left">
+            <span class="eyebrow soft">Nuevo evento</span>
+            <h2 id="formTitle">Crear evento</h2>
+            <p>Completa los datos del evento. Puedes dejarlo como borrador o publicarlo directamente.</p>
+          </div>
+
+          <p class="setup-warning error" id="configWarning" hidden></p>
+          <p id="panelMessage" class="form-message" aria-live="polite"></p>
+
+          <form id="eventForm" class="event-form">
+            <input type="hidden" id="eventId" />
+
+            <div class="field-group">
+              <label for="titulo">Título del evento</label>
+              <input id="titulo" type="text" placeholder="Ej: Culto especial de adoración" required />
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label for="fechaEvento">Fecha del evento</label>
+                <input id="fechaEvento" type="date" required />
+              </div>
+
+              <div class="field-group">
+                <label for="estado">Estado</label>
+                <select id="estado" required>
+                  <option value="borrador">Borrador</option>
+                  <option value="publicado">Publicado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="descripcion">Descripción del evento</label>
+              <textarea id="descripcion" rows="5" placeholder="Indica horario, lugar, invitación o detalle principal del evento..." required></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label for="imageFile">Imagen del evento</label>
+                <input id="imageFile" type="file" accept="image/*" />
+                <small>Se subirá al bucket de Supabase Storage configurado como eventos.</small>
+              </div>
+
+              <div class="field-group">
+                <label for="imageUrl">O usar imagen por URL</label>
+                <input id="imageUrl" type="url" placeholder="https://..." />
+                <small>Útil si ya tienes una imagen alojada en otra parte.</small>
+              </div>
+            </div>
+
+            <div class="preview-box" id="previewBox" hidden>
+              <img id="imagePreview" alt="Vista previa de imagen" />
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" id="saveButton" type="submit">Guardar evento</button>
+              <button class="btn btn-secondary" type="button" id="resetButton">Limpiar</button>
+            </div>
+          </form>
+        </article>
+
+        <aside class="panel-card help-card">
+          <span class="eyebrow soft">Flujo seguro</span>
+          <h2>Borrador y publicado</h2>
+          <p>
+            El evento se guarda en Supabase con un campo llamado <code>estado</code>. La página principal después consultará solo los registros con <code>estado = publicado</code>.
+          </p>
+          <ul class="check-list">
+            <li>Los borradores quedan guardados, pero no se muestran al público.</li>
+            <li>Los publicados quedan listos para que la web principal los consuma.</li>
+            <li>Solo usuarios registrados en <code>admin_users</code> pueden administrar.</li>
+            <li>La seguridad real queda en RLS, no en esconder la URL del panel.</li>
+          </ul>
+          <a class="btn btn-card full" href="preview.html">Ver vista previa interna</a>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-space compact-top" id="listado">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow soft">Listado</span>
+          <h2>Eventos guardados</h2>
+          <p>Desde aquí puedes editar, eliminar o cambiar el estado de cada evento.</p>
+        </div>
+
+        <div class="toolbar">
+          <input id="searchInput" type="search" placeholder="Buscar por título, descripción o fecha..." />
+          <select id="filterStatus">
+            <option value="todos">Todos los estados</option>
+            <option value="publicado">Publicados</option>
+            <option value="borrador">Borradores</option>
+          </select>
+        </div>
+
+        <div class="events-grid" id="eventsGrid"></div>
+        <p class="empty-state" id="emptyState" hidden>No hay eventos para mostrar.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="admin-footer">
+    <div class="container">
+      <p>IPROYEC Copiapó · Panel privado de administración de eventos</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vista previa interna | IPROYEC Eventos</title>
+  <link rel="icon" href="assets/favicon.ico" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="js/supabase-config.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/supabase-client.js" defer></script>
+  <script src="js/guard.js" defer></script>
+  <script src="js/preview.js" defer></script>
+</head>
+<body>
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <span id="loadingText">Cargando...</span>
+    </div>
+  </div>
+
+  <header class="admin-header">
+    <div class="container header-wrap">
+      <a class="brand" href="panel.html" aria-label="Ir al panel IPROYEC">
+        <img src="assets/logo-iproyec.png" alt="Logo IPROYEC" class="brand-mark" />
+        <div class="brand-copy">
+          <strong>IPROYEC</strong>
+          <span>Vista previa interna</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="adminNav">
+        <span></span><span></span><span></span><span class="sr-only">Abrir menú</span>
+      </button>
+
+      <nav class="admin-nav" id="adminNav" aria-label="Navegación del panel">
+        <a href="panel.html">Gestor</a>
+        <a class="active" href="preview.html">Vista previa</a>
+        <a href="https://iproyeccopiapo.cl/" target="_blank" rel="noopener noreferrer">Página principal</a>
+      </nav>
+
+      <div class="header-actions">
+        <span class="admin-email" id="adminEmail">Administrador</span>
+        <button class="btn btn-ghost compact" type="button" data-logout>Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="preview-hero">
+      <div class="container preview-hero-content">
+        <span class="eyebrow">Vista previa interna</span>
+        <h1>Eventos publicados</h1>
+        <p>
+          Esta vista sirve solo para revisar cómo se verían los eventos. La publicación oficial se integrará después directamente en iproyeccopiapo.cl.
+        </p>
+      </div>
+    </section>
+
+    <section class="section-space">
+      <div class="container">
+        <p class="setup-warning error" id="configWarning" hidden></p>
+        <p id="previewMessage" class="form-message" aria-live="polite"></p>
+
+        <div class="preview-bar">
+          <p class="preview-note">
+            Por defecto se muestran solo los eventos publicados. Puedes revisar borradores desde este panel interno.
+          </p>
+          <select id="previewStatus" aria-label="Filtrar vista previa">
+            <option value="publicado">Solo publicados</option>
+            <option value="borrador">Solo borradores</option>
+            <option value="todos">Todos</option>
+          </select>
+        </div>
+
+        <div class="events-grid" id="previewGrid"></div>
+        <p class="empty-state" id="previewEmptyState" hidden>No hay eventos disponibles para esta vista.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="admin-footer">
+    <div class="container">
+      <p>IPROYEC Copiapó · Vista previa interna de eventos</p>
+    </div>
+  </footer>
+</body>
+</html>
